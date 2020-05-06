@@ -1,15 +1,13 @@
-import Breadcrumbs from '@trendmicro/react-breadcrumbs';
-import ensureArray from 'ensure-array';
-import React, { PureComponent } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome,
   faChartLine,
   faListAlt,
-  faCogs,
   faPowerOff,
 } from '@fortawesome/free-solid-svg-icons';
+import { useHistory } from 'react-router-dom';
 
 import SideNav, {
   Toggle,
@@ -75,119 +73,78 @@ const Main = styled.main`
   transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
-export default class extends PureComponent {
-  state = {
-    selected: 'home',
-    expanded: false,
+const NavBar = () => {
+  const [selected, setSelected] = useState('/');
+  const [expanded, setExpanded] = useState(false);
+
+  const lastUpdateTime = new Date().toISOString();
+
+  const onSelect = (newSelected) => {
+    setSelected(newSelected);
+    history.push(newSelected);
+  };
+  const onToggle = (newExpanded) => {
+    setExpanded(newExpanded);
   };
 
-  lastUpdateTime = new Date().toISOString();
+  const history = useHistory();
 
-  onSelect = (selected) => {
-    this.setState({ selected: selected });
-  };
-  onToggle = (expanded) => {
-    this.setState({ expanded: expanded });
-  };
+  return (
+    <div>
+      <SideNav
+        style={{ minWidth: expanded ? navWidthExpanded : navWidthCollapsed }}
+        onSelect={onSelect}
+        onToggle={onToggle}
+      >
+        <Toggle />
+        <NavHeader expanded={expanded}>
+          <NavTitle style={{ fontSize: 20 }}>República Último Gole</NavTitle>
+          <NavSubTitle>Gestão Interna</NavSubTitle>
+        </NavHeader>
+        {expanded && (
+          <NavInfoPane>
+            <div>Time: {lastUpdateTime}</div>
+            <div>User: admin</div>
+          </NavInfoPane>
+        )}
+        <Nav defaultSelected={selected}>
+          <NavItem eventKey='/'>
+            <NavIcon>
+              <FontAwesomeIcon icon={faHome} />
+            </NavIcon>
+            <NavText style={{ paddingRight: 32 }} title='HOME'>
+              HOME
+            </NavText>
+          </NavItem>
+          <NavItem eventKey='/rh'>
+            <NavIcon>
+              <FontAwesomeIcon icon={faChartLine} />
+            </NavIcon>
+            <NavText style={{ paddingRight: 32 }} title='DEVICES'>
+              RH
+            </NavText>
+          </NavItem>
+          <NavItem eventKey='/financeiro'>
+            <NavIcon>
+              <FontAwesomeIcon icon={faListAlt} />
+            </NavIcon>
+            <NavText style={{ paddingRight: 32 }} title='REPORTS'>
+              FINANCEIRO
+            </NavText>
+          </NavItem>
+          <Separator />
+          <NavItem eventKey='logout'>
+            <NavIcon>
+              <FontAwesomeIcon icon={faPowerOff} />
+            </NavIcon>
+            <NavText style={{ paddingRight: 32 }} title='SIGN OUT'>
+              SIGN OUT
+            </NavText>
+          </NavItem>
+        </Nav>
+      </SideNav>
+    </div>
+  );
+};
 
-  pageTitle = {
-    home: 'Home',
-    devices: ['Devices'],
-    reports: ['Reports'],
-    'settings/policy': ['Settings', 'Policy'],
-    'settings/network': ['Settings', 'Network'],
-  };
-
-  renderBreadcrumbs() {
-    const { selected } = this.state;
-    const list = ensureArray(this.pageTitle[selected]);
-
-    return (
-      <Breadcrumbs>
-        {list.map((item, index) => (
-          <Breadcrumbs.Item
-            active={index === list.length - 1}
-            key={`${selected}_${index}`}
-          >
-            {item}
-          </Breadcrumbs.Item>
-        ))}
-      </Breadcrumbs>
-    );
-  }
-  render() {
-    const { expanded, selected } = this.state;
-
-    return (
-      <div>
-        <SideNav
-          style={{ minWidth: expanded ? navWidthExpanded : navWidthCollapsed }}
-          onSelect={this.onSelect}
-          onToggle={this.onToggle}
-        >
-          <Toggle />
-          <NavHeader expanded={expanded}>
-            <NavTitle style={{ fontSize: 20 }}>República Último Gole</NavTitle>
-            <NavSubTitle>Gestão Interna</NavSubTitle>
-          </NavHeader>
-          {expanded && (
-            <NavInfoPane>
-              <div>Time: {this.lastUpdateTime}</div>
-              <div>User: admin</div>
-            </NavInfoPane>
-          )}
-          <Nav defaultSelected={selected}>
-            <NavItem eventKey='home'>
-              <NavIcon>
-                <FontAwesomeIcon icon={faHome} />
-              </NavIcon>
-              <NavText style={{ paddingRight: 32 }} title='HOME'>
-                HOME
-              </NavText>
-            </NavItem>
-            <NavItem eventKey='devices'>
-              <NavIcon>
-                <FontAwesomeIcon icon={faChartLine} />
-              </NavIcon>
-              <NavText style={{ paddingRight: 32 }} title='DEVICES'>
-                DEVICES
-              </NavText>
-            </NavItem>
-            <NavItem eventKey='reports'>
-              <NavIcon>
-                <FontAwesomeIcon icon={faListAlt} />
-              </NavIcon>
-              <NavText style={{ paddingRight: 32 }} title='REPORTS'>
-                REPORTS
-              </NavText>
-            </NavItem>
-            <NavItem eventKey='settings'>
-              <NavIcon>
-                <FontAwesomeIcon icon={faCogs} />
-              </NavIcon>
-              <NavText style={{ paddingRight: 32 }} title='SETTINGS'>
-                SETTINGS
-              </NavText>
-              <NavItem eventKey='settings/policy'>
-                <NavText title='POLICIES'>POLICIES</NavText>
-              </NavItem>
-              <NavItem eventKey='settings/network'>
-                <NavText title='NETWORK'>NETWORK</NavText>
-              </NavItem>
-            </NavItem>
-            <Separator />
-            <NavItem eventKey='logout'>
-              <NavIcon>
-                <FontAwesomeIcon icon={faPowerOff} />
-              </NavIcon>
-              <NavText style={{ paddingRight: 32 }} title='SIGN OUT'>
-                SIGN OUT
-              </NavText>
-            </NavItem>
-          </Nav>
-        </SideNav>
-        <Main expanded={expanded}>{this.renderBreadcrumbs()}</Main>
-      </div>
-    );
-  }
-}
+export default NavBar;
