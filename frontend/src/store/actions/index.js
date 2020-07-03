@@ -1,2 +1,3 @@
-export const REQUEST_TEST = '@APP/REQUEST_TEST';
-export const REDUX_TEST = '@APP/REDUX_TEST';
+export const GET_DASH = '@APP/GET_DASH';
+export const GET_DASH_SUCCESS = '@APP/GET_DASH_SUCCESS';
+export const GET_DASH_FAILURE = '@APP/GET_DASH_FAILURE';

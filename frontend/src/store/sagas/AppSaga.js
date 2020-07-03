@@ -1,17 +1,24 @@
-import {takeLatest, put} from 'redux-saga/effects';
+import { takeLatest, put } from 'redux-saga/effects';
 
-import {REQUEST_TEST, REDUX_TEST} from 'store/actions';
+import { GET_DASH, GET_DASH_SUCCESS } from 'store/actions';
 
-export const getStructure = state => state.TemplateReducer.structure;
+export const getStructure = (state) => state.TemplateReducer.structure;
 
-function* test(action) {
-  yield new Promise(resolve => {
+function* getDash(action) {
+  yield new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
 
-  yield put({type: REDUX_TEST});
+  const dashData = {
+    user: {
+      name: 'Aimoré',
+      role: 'Contador',
+    },
+  };
+
+  yield put({ type: GET_DASH_SUCCESS, payload: dashData });
 }
 
 export function* watcherSaga() {
-  yield takeLatest(REQUEST_TEST, test);
+  yield takeLatest(GET_DASH, getDash);
 }
